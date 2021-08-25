@@ -38,15 +38,20 @@ class Snake {
 		let x = this.body[this.body.length - 1].x;
 		let y = this.body[this.body.length - 1].y;
 		if (x > w - 1 || x < 0 || y > h - 1 || y < 0) {
-			return true;
+			if (y > h - 1) this.setDir(0, -1);
+			else if (y < 0) this.setDir(0, 1);
+			else if (x > w - 1) this.setDir(-1, 0);
+			else if (x < 0) this.setDir(1, 0);
+			return 1;
 		}
+
 		for (let i = 0; i < this.body.length - 1; i++) {
 			let part = this.body[i];
 			if (part.x == x && part.y == y) {
-				return true;
+				return 3;
 			}
 		}
-		return false;
+		return 0;
 	}
 
 	eat(pos) {

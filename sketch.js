@@ -23,6 +23,9 @@ let question;
 let hiddenWordArray = [];
 let hiddenWordLength;
 
+let realHiddenWordArray = [];
+let realHiddenWord;
+
 let answer = "";
 let hiddenWord = "";
 
@@ -109,6 +112,7 @@ function setQuestion() {
 			for (let x = 0; x < question.answers.length; x++) {
 				if (question.answers[x].isCorrect) {
 					hiddenWord = question.answers[x].hiddenWord;
+					realHiddenWord = question.answers[x].hiddenWord;
 					answer = question.answers[x].text;
 					break;
 				}
@@ -120,6 +124,13 @@ function setQuestion() {
 			for (let x = 0; x < hiddenWord.length; x++) {
 				hiddenWordArray.push(hiddenWord[x]);
 			}
+
+			//dumb array things. i have to remake the array and cant just do "realHiddenWordArray = hiddenWordArray"
+
+			for (let x = 0; x < hiddenWord.length; x++) {
+				realHiddenWordArray.push(hiddenWord[x]);
+			}
+
 			//console.log(hiddenWordArray);
 
 			//turns each unwanted letter into a '_ '
@@ -188,6 +199,8 @@ alphabet = [
 
 let takenPositions = [];
 
+let repeatedLetters = {};
+
 function preload() {
 	head = loadImage("assets/snake_head.png");
 	bkg = loadImage("assets/bkg.png");
@@ -212,7 +225,7 @@ function preload() {
 
 function gameOver(type) {
 	if (type == "lose") {
-		console.log("lose");
+		console.log("D:");
 		background(255, 0, 0);
 		///*
 		textSize(5);
@@ -222,7 +235,7 @@ function gameOver(type) {
 		lives = "dead";
 		noLoop();
 	} else if (type == "win") {
-		console.log("win");
+		console.log(":D");
 		background(0, 255, 0);
 		///*
 		textSize(5);
@@ -230,6 +243,7 @@ function gameOver(type) {
 		fill(0, 102, 153);
 		//*/
 		snake.goodbye();
+
 		noLoop();
 	}
 	noLoop();
@@ -237,7 +251,7 @@ function gameOver(type) {
 
 function getWindowSize(val, override = 0) {
 	xOffset = 0;
-	yOffset = 75;
+	yOffset = 72.5;
 	padding = 80;
 
 	// fill screen
@@ -263,7 +277,9 @@ function setup() {
 	h = floor(height / res);
 	frameRate(7);
 	snake = new Snake(head, word, [body_img, body_img_alt]);
+	snake.setDir(1, 0);
 	foodLocation();
+	snake.grow();
 }
 
 function foodLocation() {
@@ -274,9 +290,10 @@ function foodLocation() {
 			if ([x, y] in takenPositions) {
 				//console.log("nah");
 			} else {
-				food = createVector(x, y);
+				food = createVector(x, y, (x + 23) * (y + 32));
 				takenPositions.push([x, y]);
 				foodArray.push(food);
+				realHiddenWordArray[i] = [realHiddenWordArray[i], (x + 23) * (y + 32)];
 				locationToletter[(x + 23) * (y + 32)] = hiddenWordArray[i];
 				//console.log([x, y]);
 				break;
@@ -287,33 +304,31 @@ function foodLocation() {
 
 function keyPressed() {
 	//console.log(keyCode);
-	if (key === "a") {
+	if (key === "a" && snake.xdir == 0) {
 		snake.setDir(-1, 0);
-	} else if (key === "d") {
+	} else if (key === "d" && snake.xdir == 0) {
 		snake.setDir(1, 0);
-	} else if (key === "s") {
+	} else if (key === "s" && snake.ydir == 0) {
 		snake.setDir(0, 1);
-	} else if (key === "w") {
+	} else if (key === "w" && snake.ydir == 0) {
 		snake.setDir(0, -1);
-	} else if (key == " ") {
-		snake.grow();
-	} else if (key === "A") {
+	} else if (key === "A" && snake.xdir == 0) {
 		snake.setDir(-1, 0);
-	} else if (key === "D") {
+	} else if (key === "D" && snake.xdir == 0) {
 		snake.setDir(1, 0);
-	} else if (key === "S") {
+	} else if (key === "S" && snake.ydir == 0) {
 		snake.setDir(0, 1);
-	} else if (key === "W") {
+	} else if (key === "W" && snake.ydir == 0) {
 		snake.setDir(0, -1);
 	}
 
-	if (keyCode === LEFT_ARROW) {
+	if (keyCode === LEFT_ARROW && snake.xdir == 0) {
 		snake.setDir(-1, 0);
-	} else if (keyCode === RIGHT_ARROW) {
+	} else if (keyCode === RIGHT_ARROW && snake.xdir == 0) {
 		snake.setDir(1, 0);
-	} else if (keyCode === DOWN_ARROW) {
+	} else if (keyCode === DOWN_ARROW && snake.ydir == 0) {
 		snake.setDir(0, 1);
-	} else if (keyCode === UP_ARROW) {
+	} else if (keyCode === UP_ARROW && snake.ydir == 0) {
 		snake.setDir(0, -1);
 	}
 }
@@ -342,6 +357,7 @@ function draw() {
 	currentWindowSize = [parent.window.innerWidth, parent.window.innerHeight];
 	*/
 	scale(res);
+	background(255, 255, 255);
 	for (let x = 0; x < 500 / 5; x += res / 5) {
 		for (let y = 0; y < 500 / 5; y += res / 5) {
 			image(background_, x, y, res / 5, res / 5);
@@ -356,18 +372,43 @@ function draw() {
 		) {
 			//foodLocation();
 			//setQuestion();
-			munchSound.play();
-			snake.grow();
-			hiddenWordArray.shift();
-			foodArray.shift();
-			hiddenWord = hiddenWord.substring(1);
+
+			for (let i = 0; i < foodArray.length; i++) {
+				if (foodArray[i].z == (foodArray[x].x + 23) * (foodArray[x].y + 32)) {
+					takenPositions.splice(
+						takenPositions.indexOf([foodArray[i].x, foodArray[i].y]),
+						1
+					);
+
+					for (let b = 0; b < realHiddenWordArray.length; b++) {
+						if (
+							realHiddenWordArray[b][1] ==
+							(foodArray[x].x + 23) * (foodArray[x].y + 32)
+						) {
+							realHiddenWordArray.splice(b, 1);
+							break;
+						}
+					}
+
+					foodArray.splice(i, 1);
+					munchSound.play();
+					snake.grow();
+					hiddenWordArray.shift(); //this one line has caused me so much pain.
+					hiddenWord = hiddenWord.substring(1);
+					break;
+				}
+			}
+
+			//foodArray.shift();
+
 			//turns each unwanted letter into a '_ '
 			let censored = " ";
 			for (let x = 0; x < hiddenWord.length; x++) {
 				censored += "_ ";
 			}
+			let tempWord = realHiddenWord.replace(hiddenWord, censored);
 
-			hangman.innerHTML = answer.replace(hiddenWord, censored);
+			hangman.innerHTML = answer.replace(realHiddenWord, tempWord);
 		} else if (
 			snake.eat(foodArray[x]) &&
 			hiddenWordArray[currentLetter] !=
@@ -380,17 +421,17 @@ function draw() {
 
 	noStroke();
 	snake.update();
-	snake.show();
 	for (let x = 0; x < foodArray.length; x++) {
 		//image(apple, foodArray[x].x, foodArray[x].y, 1, 1);
 		image(
-			letters[hiddenWordArray[x].toLowerCase()],
+			letters[realHiddenWordArray[x][0].toLowerCase()],
 			foodArray[x].x,
 			foodArray[x].y,
 			1,
 			1
 		);
 	}
+	snake.show();
 	//console.log("drawn images");
 
 	/*
@@ -414,13 +455,17 @@ function draw() {
 	}
 
 	updateLifeCount();
-	if (snake.endGame() && lives <= 0) {
+	if (snake.endGame() == 1 && lives <= 0) {
 		gameOver("lose");
 		updateLifeCount();
-	} else if (snake.endGame() && lives > 0) {
+	} else if (snake.endGame() == 1 && lives > 0) {
 		removeLife(1);
 		updateLifeCount();
+	} else if (snake.endGame() == 3) {
+		gameOver("lose");
+		updateLifeCount();
 	}
+
 	if (lives <= 0) {
 		gameOver("lose");
 	}
