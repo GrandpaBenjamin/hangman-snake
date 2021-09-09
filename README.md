@@ -1,6 +1,6 @@
-# hangman-snake
-hangman snake for my cs coursework. its snake :D<br>
-you answer the questions by spelling out the answers. like in hangman
+#Portfolio snake
+its a stripped down version of hangman snake - its without the hangman part :D
+
 
 ## its snake :D
 the snake moves<br>
