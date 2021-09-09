@@ -1,4 +1,4 @@
-#Portfolio snake
+# Portfolio snake
 its a stripped down version of hangman snake - its without the hangman part :D
 
 
