@@ -9,4 +9,17 @@
 
 .center {
 	text-align: center;
+	position: center;
+}
+canvas {
+	border-radius: 12px;
+}
+
+* {
+	font-family: consolas;
+}
+
+@font-face {
+	font-family: consolas;
+	src: url(./consola.ttf);
 }
