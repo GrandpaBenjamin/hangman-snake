@@ -147,6 +147,7 @@ function gameOver(type) {
 	if (type == "lose") {
 		console.log("D:");
 		background(255, 0, 0, 0);
+		background(255, 0, 0, 0);
 		textSize(5);
 		//text("D:", 1, 10);
 		fill(0, 102, 153);
@@ -214,7 +215,8 @@ function foodLocation() {
 		while (true) {
 			let x = floor(random(w));
 			let y = floor(random(h));
-			if ([x, y] in takenPositions) {
+			console.log(snake.body)
+			if ([x, y] in takenPositions || createVector(x,y) in snake.body) {
 				//console.log("nah");
 			} else {
 				food = createVector(x, y, (x + 23) * (y + 32));
@@ -258,12 +260,6 @@ function keyPressed() {
 	}
 }
 
-function windowResized() {
-	console.log("resized");
-	resizeCanvas(getWindowSize("x", 0), getWindowSize("y", 0));
-	scale(res);
-	foodLocation();
-}
 
 function removeLife(amount) {
 	lives -= amount;
@@ -317,6 +313,7 @@ function draw() {
 		removeLife(1);
 		updateScore();
 	} else if (snake.endGame() == 3) {
+		gameOver("lose");
 		gameOver("lose");
 		updateScore();
 	}
