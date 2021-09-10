@@ -20,8 +20,8 @@ let nextQuestion = 0;
 //let word = "joe"; //change this word to change the word
 let word;
 let question;
-let hiddenWordArray = [];
-let hiddenWordLength;
+let hiddenWordArray = [1];
+let hiddenWordLength = 1;
 
 let realHiddenWordArray = [];
 let realHiddenWord;
@@ -37,7 +37,7 @@ let currentLetter = 0;
 
 let score = -1;
 let winScore = 2;
-let lives = 3;
+let lives = 1;
 let numImages = [];
 let letters = {};
 
@@ -74,89 +74,9 @@ var letterToNum = {
 
 let currentWindowSize = [parent.window.innerWidth, parent.window.innerHeight];
 
-setQuestion();
-
-function setQuestion() {
-	if (score >= winScore) {
-		gameOver("win");
-		return;
-	}
-	while (true) {
-		let works = false;
-		for (
-			let x = 0;
-			x < questions.data.questions[nextQuestion].answers.length;
-			x++
-		) {
-			if (questions.data.questions[nextQuestion].answers[x].isCorrect) {
-				if (
-					questions.data.questions[nextQuestion].answers[x].hiddenWord != null
-				) {
-					works = true;
-				}
-				break;
-			}
-		}
-		if (works) {
-			randomNum = Math.floor(Math.random() * questions.data.questions.length);
-			//console.log(randomNum);
-			//console.log(questions.data.questions.length);
-
-			qUESTION = document.getElementById("question");
-			qUESTION.innerHTML = questions.data.questions[nextQuestion].title;
-
-			question = questions.data.questions[nextQuestion];
-
-			nextQuestion++; // = randomNum;
-
-			for (let x = 0; x < question.answers.length; x++) {
-				if (question.answers[x].isCorrect) {
-					hiddenWord = question.answers[x].hiddenWord;
-					realHiddenWord = question.answers[x].hiddenWord;
-					answer = question.answers[x].text;
-					break;
-				}
-			}
-
-			hangman = document.getElementById("hangman");
-
-			//makes hidden word into a list
-			for (let x = 0; x < hiddenWord.length; x++) {
-				hiddenWordArray.push(hiddenWord[x]);
-			}
-
-			//dumb array things. i have to remake the array and cant just do "realHiddenWordArray = hiddenWordArray"
-
-			for (let x = 0; x < hiddenWord.length; x++) {
-				realHiddenWordArray.push(hiddenWord[x]);
-			}
-
-			//console.log(hiddenWordArray);
-
-			//turns each unwanted letter into a '_ '
-			let censored = "";
-			for (let x = 0; x < hiddenWordArray.length; x++) {
-				censored += "_ ";
-			}
-
-			hangman.innerHTML = answer.replace(hiddenWord, censored);
-			hiddenWordLength = hiddenWord.length;
-
-			break;
-		} else {
-			nextQuestion++;
-		}
-	}
-
-	score++;
-
+function updateScore() {
 	sCORE = document.getElementById("score");
 	sCORE.innerHTML = `score: ${score}`;
-}
-
-function updateLifeCount() {
-	lIVES = document.getElementById("lives");
-	lIVES.innerHTML = `lives left: ${lives}`;
 }
 
 alphabet = [
@@ -204,7 +124,7 @@ let repeatedLetters = {};
 function preload() {
 	head = loadImage("assets/snake_head.png");
 	bkg = loadImage("assets/bkg.png");
-	apple = loadImage("assets/apple.png");
+	apple = loadImage("assets/base_apple.png");
 	body_img = loadImage("assets/snake_body.png");
 	body_img_alt = loadImage("assets/snake_body_alt.png");
 
@@ -226,12 +146,11 @@ function preload() {
 function gameOver(type) {
 	if (type == "lose") {
 		console.log("D:");
-		background(255, 0, 0);
-		///*
+		background(255, 0, 0, 0);
+		background(255, 0, 0, 0);
 		textSize(5);
-		text("D:", 1, 10);
+		//text("D:", 1, 10);
 		fill(0, 102, 153);
-		//*/
 		lives = "dead";
 		noLoop();
 	} else if (type == "win") {
@@ -257,7 +176,11 @@ function getWindowSize(val, override = 0) {
 	// fill screen
 	windowSizeX = parent.window.innerWidth - xOffset - (padding - 60);
 	windowSizeY = parent.window.innerHeight - yOffset - padding + 10;
-	res = (windowSizeX + windowSizeY) / 75;
+	if (override == 500) {
+		res = 30;
+	} else {
+		res = (windowSizeX + windowSizeY) / 75;
+	}
 
 	if (override != 0) {
 		windowSizeX = override;
@@ -272,29 +195,33 @@ function getWindowSize(val, override = 0) {
 }
 
 function setup() {
-	createCanvas(getWindowSize("x", 0), getWindowSize("y", 0));
+	score++;
+	sCORE = document.getElementById("score");
+	sCORE.innerHTML = `score: ${score}`;
+	createCanvas(getWindowSize("x", 500), getWindowSize("y", 500));
 	w = floor(width / res);
 	h = floor(height / res);
-	frameRate(7);
+	frameRate(5);
 	snake = new Snake(head, word, [body_img, body_img_alt]);
 	snake.setDir(1, 0);
 	foodLocation();
 	snake.grow();
+	outputVolume(0.5);
 }
 
 function foodLocation() {
+	foodArray = [];
 	for (let i = 0; i < hiddenWordArray.length; i++) {
 		while (true) {
 			let x = floor(random(w));
 			let y = floor(random(h));
-			if ([x, y] in takenPositions) {
+			console.log(snake.body)
+			if ([x, y] in takenPositions || createVector(x,y) in snake.body) {
 				//console.log("nah");
 			} else {
 				food = createVector(x, y, (x + 23) * (y + 32));
 				takenPositions.push([x, y]);
 				foodArray.push(food);
-				realHiddenWordArray[i] = [realHiddenWordArray[i], (x + 23) * (y + 32)];
-				locationToletter[(x + 23) * (y + 32)] = hiddenWordArray[i];
 				//console.log([x, y]);
 				break;
 			}
@@ -333,12 +260,6 @@ function keyPressed() {
 	}
 }
 
-function windowResized() {
-	console.log("resized");
-	resizeCanvas(getWindowSize("x", 0), getWindowSize("y", 0));
-	scale(res);
-	foodLocation();
-}
 
 function removeLife(amount) {
 	lives -= amount;
@@ -357,113 +278,44 @@ function draw() {
 	currentWindowSize = [parent.window.innerWidth, parent.window.innerHeight];
 	*/
 	scale(res);
+
 	background(255, 255, 255);
 	for (let x = 0; x < 500 / 5; x += res / 5) {
 		for (let y = 0; y < 500 / 5; y += res / 5) {
 			image(background_, x, y, res / 5, res / 5);
 		}
 	}
+	if (lives != "dead") {
+		background("rgba(0,255,0, 0.25)");
+		stroke(255);
+		fill(255, 255, 255, 100);
+		rect(70, 70, 60, 60, 10);
+	}
 
-	for (let x = 0; x < foodArray.length; x++) {
-		if (
-			snake.eat(foodArray[x]) &&
-			hiddenWordArray[currentLetter] ==
-				locationToletter[(foodArray[x].x + 23) * (foodArray[x].y + 32)]
-		) {
-			//foodLocation();
-			//setQuestion();
-
-			for (let i = 0; i < foodArray.length; i++) {
-				if (foodArray[i].z == (foodArray[x].x + 23) * (foodArray[x].y + 32)) {
-					takenPositions.splice(
-						takenPositions.indexOf([foodArray[i].x, foodArray[i].y]),
-						1
-					);
-
-					for (let b = 0; b < realHiddenWordArray.length; b++) {
-						if (
-							realHiddenWordArray[b][1] ==
-							(foodArray[x].x + 23) * (foodArray[x].y + 32)
-						) {
-							realHiddenWordArray.splice(b, 1);
-							break;
-						}
-					}
-
-					foodArray.splice(i, 1);
-					munchSound.play();
-					snake.grow();
-					hiddenWordArray.shift(); //this one line has caused me so much pain.
-					hiddenWord = hiddenWord.substring(1);
-					break;
-				}
-			}
-
-			//foodArray.shift();
-
-			//turns each unwanted letter into a '_ '
-			let censored = " ";
-			for (let x = 0; x < hiddenWord.length; x++) {
-				censored += "_ ";
-			}
-			let tempWord = realHiddenWord.replace(hiddenWord, censored);
-
-			hangman.innerHTML = answer.replace(realHiddenWord, tempWord);
-		} else if (
-			snake.eat(foodArray[x]) &&
-			hiddenWordArray[currentLetter] !=
-				locationToletter[(foodArray[x].x + 23) * (foodArray[x].y + 32)]
-		) {
-			removeLife(1);
-			//gameOver("lose");
-		}
+	if (snake.eat(foodArray[0])) {
+		munchSound.play();
+		snake.grow();
+		score++;
+		foodLocation();
 	}
 
 	noStroke();
 	snake.update();
-	for (let x = 0; x < foodArray.length; x++) {
-		//image(apple, foodArray[x].x, foodArray[x].y, 1, 1);
-		image(
-			letters[realHiddenWordArray[x][0].toLowerCase()],
-			foodArray[x].x,
-			foodArray[x].y,
-			1,
-			1
-		);
-	}
+	image(apple, foodArray[0].x, foodArray[0].y, 1, 1);
 	snake.show();
-	//console.log("drawn images");
 
-	/*
-	try {
-		
-	} catch (e) {
-		//console.log(e);
-		gameOver("win");
-		background(255, 255, 255);
-	}
-	*/
+	updateScore();
 
-	/*
-	if (score >= 5) {
-		gameOver("win");
-	}
-	*/
-	if (currentLetter == hiddenWordArray.length) {
-		setQuestion();
-		foodLocation();
-	}
-
-	updateLifeCount();
 	if (snake.endGame() == 1 && lives <= 0) {
 		gameOver("lose");
-		updateLifeCount();
+		updateScore();
 	} else if (snake.endGame() == 1 && lives > 0) {
 		removeLife(1);
-		updateLifeCount();
+		updateScore();
 	} else if (snake.endGame() == 3) {
 		gameOver("lose");
-		updateLifeCount();
+		gameOver("lose");
+		updateScore();
 	}
 
 	if (lives <= 0) {

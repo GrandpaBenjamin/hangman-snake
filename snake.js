@@ -5,7 +5,7 @@ class Snake {
 		this.bodies = bodies;
 		this.body = [];
 		this.bodyLetters = [];
-		this.body[0] = createVector(floor(w / 2), floor(h / 2), -1);
+		this.body[0] = createVector(floor(w / 2), floor(h / 2));
 		this.xdir = 0;
 		this.ydir = 0;
 		this.len = 0;
@@ -48,6 +48,7 @@ class Snake {
 		for (let i = 0; i < this.body.length - 1; i++) {
 			let part = this.body[i];
 			if (part.x == x && part.y == y) {
+				this.goodbye()
 				return 3;
 			}
 		}
