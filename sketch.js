@@ -76,7 +76,7 @@ let currentWindowSize = [parent.window.innerWidth, parent.window.innerHeight];
 
 function updateScore() {
 	sCORE = document.getElementById("score");
-	sCORE.innerHTML = `score: ${score}`;
+	sCORE.innerHTML = `score: ${score}	highscore: ${getCookie("highscore")}`;
 }
 
 alphabet = [
@@ -121,6 +121,33 @@ let takenPositions = [];
 
 let repeatedLetters = {};
 
+function setCookie(cname, cvalue) {
+	document.cookie = cname + "=" + cvalue + ";" +";path=/";
+  }
+
+function getCookie(cname) {
+	let name = cname + "=";
+	let ca = document.cookie.split(';');
+	for(let i = 0; i < ca.length; i++) {
+	  let c = ca[i];
+	  while (c.charAt(0) == ' ') {
+		c = c.substring(1);
+	  }
+	  if (c.indexOf(name) == 0) {
+		return c.substring(name.length, c.length);
+	  }
+	}
+	return "";
+  }
+
+function loadCookies(){
+	if (document.cookie == ""){
+		document.cookie = "highscore=0";
+		console.log(getCookie("highscore"));
+	}else{
+		console.log(getCookie("highscore"))
+	}
+}
 function preload() {
 	head = loadImage("assets/snake_head.png");
 	bkg = loadImage("assets/bkg.png");
@@ -152,6 +179,11 @@ function gameOver(type) {
 		//text("D:", 1, 10);
 		fill(0, 102, 153);
 		lives = "dead";
+		if (score > getCookie("highscore")){
+			setCookie("highscore",score);
+			updateScore();
+		}
+
 		noLoop();
 	} else if (type == "win") {
 		console.log(":D");
@@ -195,6 +227,7 @@ function getWindowSize(val, override = 0) {
 }
 
 function setup() {
+	loadCookies();
 	score++;
 	sCORE = document.getElementById("score");
 	sCORE.innerHTML = `score: ${score}`;
