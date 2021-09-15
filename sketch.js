@@ -257,7 +257,11 @@ function getWindowSize(val, override = 0) {
 	// fill screen
 	windowSizeX = parent.window.innerWidth - xOffset - (padding - 60);
 	windowSizeY = parent.window.innerHeight - yOffset - padding + 10;
-	res = (windowSizeX + windowSizeY) / 75;
+	if (override == 500) {
+		res = 30;
+	} else {
+		res = (windowSizeX + windowSizeY) / 75;
+	}
 
 	if (override != 0) {
 		windowSizeX = override;
@@ -372,7 +376,7 @@ function draw() {
 	background(255, 255, 255);
 	for (let x = 0; x < 500 / 5; x += res / 5) {
 		for (let y = 0; y < 500 / 5; y += res / 5) {
-			image(background_, x, y, res / 5, res / 5);
+			image(background_, x, y, res, res);
 		}
 	}
 

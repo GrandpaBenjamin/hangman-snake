@@ -9,4 +9,22 @@
 
 .center {
 	text-align: center;
+	position: center;
+}
+
+.scoreHighScore {
+	padding-left: 100px;
+}
+
+canvas {
+	border-radius: 12px;
+}
+
+* {
+	font-family: consolas;
+}
+
+@font-face {
+	font-family: consolas;
+	src: url(./consola.ttf);
 }
