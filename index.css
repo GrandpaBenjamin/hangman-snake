@@ -11,6 +11,11 @@
 	text-align: center;
 	position: center;
 }
+
+.scoreHighScore {
+	padding-left: 100px;
+}
+
 canvas {
 	border-radius: 12px;
 }

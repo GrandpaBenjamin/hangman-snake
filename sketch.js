@@ -122,30 +122,30 @@ let takenPositions = [];
 let repeatedLetters = {};
 
 function setCookie(cname, cvalue) {
-	document.cookie = cname + "=" + cvalue + ";" +";path=/";
-  }
+	document.cookie = cname + "=" + cvalue + ";" + ";path=/";
+}
 
 function getCookie(cname) {
 	let name = cname + "=";
-	let ca = document.cookie.split(';');
-	for(let i = 0; i < ca.length; i++) {
-	  let c = ca[i];
-	  while (c.charAt(0) == ' ') {
-		c = c.substring(1);
-	  }
-	  if (c.indexOf(name) == 0) {
-		return c.substring(name.length, c.length);
-	  }
+	let ca = document.cookie.split(";");
+	for (let i = 0; i < ca.length; i++) {
+		let c = ca[i];
+		while (c.charAt(0) == " ") {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
 	}
 	return "";
-  }
+}
 
-function loadCookies(){
-	if (document.cookie == ""){
+function loadCookies() {
+	if (document.cookie == "") {
 		document.cookie = "highscore=0";
 		console.log(getCookie("highscore"));
-	}else{
-		console.log(getCookie("highscore"))
+	} else {
+		console.log(getCookie("highscore"));
 	}
 }
 function preload() {
@@ -179,8 +179,8 @@ function gameOver(type) {
 		//text("D:", 1, 10);
 		fill(0, 102, 153);
 		lives = "dead";
-		if (score > getCookie("highscore")){
-			setCookie("highscore",score);
+		if (score > getCookie("highscore")) {
+			setCookie("highscore", score);
 			updateScore();
 		}
 
@@ -229,8 +229,7 @@ function getWindowSize(val, override = 0) {
 function setup() {
 	loadCookies();
 	score++;
-	sCORE = document.getElementById("score");
-	sCORE.innerHTML = `score: ${score}`;
+	updateScore();
 	createCanvas(getWindowSize("x", 500), getWindowSize("y", 500));
 	w = floor(width / res);
 	h = floor(height / res);
@@ -248,8 +247,8 @@ function foodLocation() {
 		while (true) {
 			let x = floor(random(w));
 			let y = floor(random(h));
-			console.log(snake.body)
-			if ([x, y] in takenPositions || createVector(x,y) in snake.body) {
+			console.log(snake.body);
+			if ([x, y] in takenPositions || createVector(x, y) in snake.body) {
 				//console.log("nah");
 			} else {
 				food = createVector(x, y, (x + 23) * (y + 32));
@@ -292,7 +291,6 @@ function keyPressed() {
 		snake.setDir(0, -1);
 	}
 }
-
 
 function removeLife(amount) {
 	lives -= amount;
