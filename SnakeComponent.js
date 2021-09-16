@@ -16,8 +16,8 @@ class SnakeGame extends Component {
 					id="scaled-frame"
 					title="snake"
 					src="../snak/index.html"
-					height={500}
-					width={500}
+					height={525}
+					width={560}
 					style={{
 						margin: "0px",
 						border: "none",
