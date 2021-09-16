@@ -48,8 +48,7 @@ class Snake {
 		for (let i = 0; i < this.body.length - 1; i++) {
 			let part = this.body[i];
 			if (part.x == x && part.y == y) {
-				this.goodbye()
-				return 3;
+				return 1;
 			}
 		}
 		return 0;

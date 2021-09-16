@@ -16,6 +16,12 @@
 	padding-left: 100px;
 }
 
+.fakeCenter {
+	width: 50%;
+	margin: 0 auto;
+	padding-left: 100px;
+}
+
 canvas {
 	border-radius: 12px;
 }

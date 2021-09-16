@@ -183,7 +183,8 @@ function gameOver(type) {
 			setCookie("highscore", score);
 			updateScore();
 		}
-
+		rESTART = document.getElementById("restart");
+		rESTART.innerHTML = "Press SPACE to restart";
 		noLoop();
 	} else if (type == "win") {
 		console.log(":D");
@@ -263,7 +264,9 @@ function foodLocation() {
 
 function keyPressed() {
 	//console.log(keyCode);
-	if (key === "a" && snake.xdir == 0) {
+	if (key === " ") {
+		location.reload();
+	} else if (key === "a" && snake.xdir == 0) {
 		snake.setDir(-1, 0);
 	} else if (key === "d" && snake.xdir == 0) {
 		snake.setDir(1, 0);
